@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#241b18">
+<title>La Biblioteca Secreta</title>
+<style>
+:root{--ink:#2c211b;--muted:#76665b;--paper:#f6f0e5;--card:#fffaf1;--wine:#6b2737;--gold:#b08a50;--line:#dfd0ba}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Georgia,'Times New Roman',serif}
+header{background:linear-gradient(120deg,#241b18,#4a3028);color:#f8edda;padding:34px 20px 28px;text-align:center;border-bottom:4px solid var(--gold)}
+.eyebrow{letter-spacing:.22em;text-transform:uppercase;font:11px Arial,sans-serif;color:#d9bd8b}
+h1{font-size:clamp(30px,6vw,52px);font-weight:normal;margin:10px 0 8px}header p{margin:0;color:#e1d2bd;font-style:italic}
+main{max-width:1050px;margin:0 auto;padding:24px 18px 60px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 22px}
+input,select,button{font:15px Arial,sans-serif;border-radius:8px;padding:12px;border:1px solid var(--line);background:#fffaf3;color:var(--ink)}
+input{flex:1;min-width:190px}select{min-width:150px}
+.shelf{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.book{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;box-shadow:0 5px 15px #38251a0d;display:flex;flex-direction:column;min-height:220px}
+.book .ornament{color:var(--gold);font-size:25px}.book h2{font-size:22px;font-weight:normal;margin:12px 0 5px}.author{color:var(--muted);font-style:italic;font-size:14px}.tag{font:11px Arial,sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--wine);margin-top:12px}
+.book button{margin-top:auto;background:var(--wine);border-color:var(--wine);color:#fff8ed;cursor:pointer}
+.note{color:var(--muted);font:13px/1.6 Arial,sans-serif;margin:22px 2px}
+.reader{display:none;background:#fffaf1;border:1px solid var(--line);border-radius:12px;padding:clamp(20px,5vw,48px);margin-top:22px}
+.reader.active{display:block}.reader h2{font-size:clamp(27px,4vw,38px);font-weight:normal;margin:8px 0}.reader .body{font-size:19px;line-height:1.9;white-space:pre-wrap;max-width:720px;margin:28px auto}.reader .body p{margin:0 0 1.3em}
+.reader button{cursor:pointer;background:transparent}.reader-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.empty{grid-column:1/-1;text-align:center;padding:35px;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font:12px Arial,sans-serif;padding:20px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Un refugio entre páginas</div>
+  <h1>La Biblioteca Secreta</h1>
+  <p>Historias para leer despacito, como si el mundo esperara.</p>
+</header>
+<main>
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Buscar por título o autor…" aria-label="Buscar novelas">
+    <select id="category" aria-label="Filtrar categoría"><option value="">Todas las categorías</option></select>
+  </div>
+  <section id="shelf" class="shelf" aria-live="polite"></section>
+  <p class="note">Esta biblioteca es una edición inicial. Para añadir novelas a la versión publicada, edita el archivo <strong>books.js</strong> siguiendo las instrucciones del archivo LEEME.</p>
+  <section id="reader" class="reader">
+    <div class="reader-head">
+      <button id="back">← Volver a la biblioteca</button>
+      <span class="eyebrow">Sala de lectura</span>
+    </div>
+    <h2 id="readerTitle"></h2>
+    <div id="readerAuthor" class="author"></div>
+    <div id="readerBody" class="body"></div>
+  </section>
+</main>
+<footer>Hecha con cariño · Una página para perderse en buenas historias</footer>
+<script src="books.js"></script>
+<script>
+const shelf=document.getElementById('shelf'), search=document.getElementById('search'), category=document.getElementById('category'), reader=document.getElementById('reader');
+const cats=[...new Set(BOOKS.map(b=>b.category).filter(Boolean))];
+cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;category.appendChild(o)});
+function render(){
+ const q=search.value.toLocaleLowerCase('es'), c=category.value;
+ const list=BOOKS.filter(b=>(!c||b.category===c)&&(`${b.title} ${b.author} ${b.category}`.toLocaleLowerCase('es').includes(q)));
+ shelf.innerHTML='';
+ if(!list.length){shelf.innerHTML='<div class="empty">No encontramos esa novela. Prueba otra búsqueda.</div>';return}
+ list.forEach((b,i)=>{const card=document.createElement('article');card.className='book';
+ const orn=document.createElement('div');orn.className='ornament';orn.textContent='❧';
+ const title=document.createElement('h2');title.textContent=b.title;
+ const author=document.createElement('div');author.className='author';author.textContent=b.author||'Autoría no indicada';
+ const tag=document.createElement('div');tag.className='tag';tag.textContent=b.category||'Novela';
+ const btn=document.createElement('button');btn.textContent='Abrir y leer';btn.onclick=()=>openBook(b);
+ card.append(orn,title,author,tag,btn);shelf.append(card)});
+}
+function openBook(b){
+ document.getElementById('readerTitle').textContent=b.title;
+ document.getElementById('readerAuthor').textContent=b.author||'Autoría no indicada';
+ const body=document.getElementById('readerBody');body.textContent='';
+ (b.content||'Esta novela aún no tiene texto. Añade el contenido en books.js para publicarlo.').split(/\n\s*\n/).forEach(p=>{const para=document.createElement('p');para.textContent=p;body.appendChild(para)});
+ reader.classList.add('active');shelf.style.display='none';document.querySelector('.toolbar').style.display='none';reader.scrollIntoView({behavior:'smooth'});
+}
+document.getElementById('back').onclick=()=>{reader.classList.remove('active');shelf.style.display='grid';document.querySelector('.toolbar').style.display='flex';window.scrollTo({top:0,behavior:'smooth'})};
+search.addEventListener('input',render);category.addEventListener('change',render);render();
+</script>
+</body></html>
