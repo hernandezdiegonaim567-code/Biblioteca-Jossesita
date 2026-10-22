@@ -118,7 +118,7 @@ function openBook(b){
  document.getElementById('readerTitle').textContent=b.title;
  document.getElementById('readerAuthor').textContent=b.author||'Autoría no indicada';
  const body=document.getElementById('readerBody');body.textContent='';
- (b.content||`https://drive.google.com/drive/folders/1kqVJns2lu0yBQPUkhpIRk2V3NylUbfJ5?usp=drive_link.').split(/\n\s*\n/).forEach(p=>{const para=document.createElement('p');para.textContent=p;body.appendChild(para)});
+ (b.content||`"https://drive.google.com/drive/folders/1kqVJns2lu0yBQPUkhpIRk2V3NylUbfJ5?usp=drive_link".').split(/\n\s*\n/).forEach(p=>{const para=document.createElement('p');para.textContent=p;body.appendChild(para)});
  reader.classList.add('active');shelf.style.display='none';document.querySelector('.toolbar').style.display='none';reader.scrollIntoView({behavior:'smooth'});
 }
 document.getElementById('back').onclick=()=>{reader.classList.remove('active');shelf.style.display='grid';document.querySelector('.toolbar').style.display='flex';window.scrollTo({top:0,behavior:'smooth'})};
