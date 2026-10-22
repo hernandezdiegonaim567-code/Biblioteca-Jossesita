@@ -58,24 +58,61 @@ const cats=[...new Set(BOOKS.map(b=>b.category).filter(Boolean))];
 cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;category.appendChild(o)});
 function render(){
  const q=search.value.toLocaleLowerCase('es'), c=category.value;
- const list=BOOKS.filter(b=>(!c||b.category===c)&&(`${b.title} ${b.author} ${b.category}`.toLocaleLowerCase('es').includes(q)));
+ const list=BOOKS.filter(
+   b=>(!c||b.category===c)&&
+   (`${b.title} ${b.author} ${b.category}`.toLocaleLowerCase('es').includes(q))
+ );
+
  shelf.innerHTML='';
- if(!list.length){shelf.innerHTML='<div class="empty">No encontramos esa novela. Prueba otra búsqueda.</div>';return}
- list.forEach((b,i)=>{const card=document.createElement('article');card.className='book';
-const cover=document.createElement('img');
-cover.src='Portada.jpg';
-cover.style.width='100%';
-cover.style.borderRadius='10px';
-cover.style.marginBottom='15px';
-card.append(cover,title,author,tag,btn);
-btn.onclick=()=>{
-    if(b.link){
-        window.open(b.link,'_blank');
-    }else{
-        openBook(b);
-    }
-};
- card.append(orn,title,author,tag,btn);shelf.append(card)});
+
+ if(!list.length){
+   shelf.innerHTML='<div class="empty">No encontramos esa novela. Prueba otra búsqueda.</div>';
+   return;
+ }
+
+ list.forEach((b)=>{
+
+   const card=document.createElement('article');
+   card.className='book';
+
+   const cover=document.createElement('img');
+   cover.src='Portada.jpg';
+   cover.style.width='100%';
+   cover.style.borderRadius='10px';
+   cover.style.marginBottom='15px';
+
+   const title=document.createElement('h2');
+   title.textContent=b.title;
+
+   const author=document.createElement('div');
+   author.className='author';
+   author.textContent=b.author || 'Autoría no indicada';
+
+   const tag=document.createElement('div');
+   tag.className='tag';
+   tag.textContent=b.category || 'Novela';
+
+   const btn=document.createElement('button');
+   btn.textContent='Abrir colección';
+
+   btn.onclick=()=>{
+      if(b.link){
+         window.open(b.link,'_blank');
+      }else{
+         openBook(b);
+      }
+   };
+
+   card.append(
+      cover,
+      title,
+      author,
+      tag,
+      btn
+   );
+
+   shelf.append(card);
+ });
 }
 function openBook(b){
  document.getElementById('readerTitle').textContent=b.title;
