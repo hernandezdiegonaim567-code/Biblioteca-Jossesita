@@ -68,11 +68,12 @@ cover.style.width='100%';
 cover.style.borderRadius='10px';
 cover.style.marginBottom='15px';
 card.append(cover,title,author,tag,btn);
-  if(b.link){
-    window.open(b.link,'_blank');
-  }else{
-    openBook(b);
-  }
+btn.onclick=()=>{
+    if(b.link){
+        window.open(b.link,'_blank');
+    }else{
+        openBook(b);
+    }
 };
  card.append(orn,title,author,tag,btn);shelf.append(card)});
 }
