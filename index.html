@@ -30,7 +30,7 @@ footer{text-align:center;color:var(--muted);font:12px Arial,sans-serif;padding:2
 <body>
 <header>
   <div class="eyebrow">Un refugio entre páginas</div>
-  <h1>La Biblioteca Secreta</h1>
+  <h1>Biblioteca Jossesita</h1>
   <p>Un rincón especial para guardar historias inolvidables.</p>
 </header>
 <main>
@@ -39,18 +39,18 @@ footer{text-align:center;color:var(--muted);font:12px Arial,sans-serif;padding:2
     <select id="category" aria-label="Filtrar categoría"><option value="">Todas las categorías</option></select>
   </div>
   <section id="shelf" class="shelf" aria-live="polite"></section>
-  <p class="note">Esta biblioteca es una edición inicial. Para añadir novelas a la versión publicada, edita el archivo <strong>books.js</strong> siguiendo las instrucciones del archivo LEEME.</p>
+  <p class="note"></p>
   <section id="reader" class="reader">
     <div class="reader-head">
       <button id="back">← Volver a la biblioteca</button>
       <span class="eyebrow">Sala de lectura</span>
     </div>
-    <h2 id="readerTitle"></h2>
+    <h2 id="readerTitle">Para que siempre tengas una historia esperándote.</h2>
     <div id="readerAuthor" class="author"></div>
     <div id="readerBody" class="body"></div>
   </section>
 </main>
-<footer>Hecha con cariño · Una página para perderse en buenas historias</footer>
+<footer>Creada especialmente para Joss 💜</footer>
 <script src="books.js"></script>
 <script>
 const shelf=document.getElementById('shelf'), search=document.getElementById('search'), category=document.getElementById('category'), reader=document.getElementById('reader');
@@ -62,11 +62,12 @@ function render(){
  shelf.innerHTML='';
  if(!list.length){shelf.innerHTML='<div class="empty">No encontramos esa novela. Prueba otra búsqueda.</div>';return}
  list.forEach((b,i)=>{const card=document.createElement('article');card.className='book';
- const orn=document.createElement('div');orn.className='ornament';orn.textContent='❧';
- const title=document.createElement('h2');title.textContent=b.title;
- const author=document.createElement('div');author.className='author';author.textContent=b.author||'Autoría no indicada';
- const tag=document.createElement('div');tag.className='tag';tag.textContent=b.category||'Novela';
- const btn=document.createElement('button');btn.textContent='Abrir colección';btn.onclick=()=>{
+const cover=document.createElement('img');
+cover.src='portada.jpg';
+cover.style.width='100%';
+cover.style.borderRadius='10px';
+cover.style.marginBottom='15px';
+card.append(cover,title,author,tag,btn);
   if(b.link){
     window.open(b.link,'_blank');
   }else{
