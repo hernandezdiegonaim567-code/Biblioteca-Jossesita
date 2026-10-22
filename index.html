@@ -66,7 +66,13 @@ function render(){
  const title=document.createElement('h2');title.textContent=b.title;
  const author=document.createElement('div');author.className='author';author.textContent=b.author||'Autoría no indicada';
  const tag=document.createElement('div');tag.className='tag';tag.textContent=b.category||'Novela';
- const btn=document.createElement('button');btn.textContent='Abrir y leer';btn.onclick=()=>openBook(b);
+ const btn=document.createElement('button');btn.textContent='Abrir y leer';btn.onclick=()=>{
+  if(b.link){
+    window.open(b.link,'_blank');
+  }else{
+    openBook(b);
+  }
+};
  card.append(orn,title,author,tag,btn);shelf.append(card)});
 }
 function openBook(b){
