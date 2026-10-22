@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#241b18">
-<title>La Biblioteca Secreta</title>
+<title>La Biblioteca de Joss</title>
 <style>
 :root{--ink:#2c211b;--muted:#76665b;--paper:#f6f0e5;--card:#fffaf1;--wine:#6b2737;--gold:#b08a50;--line:#dfd0ba}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Georgia,'Times New Roman',serif}
@@ -31,7 +31,7 @@ footer{text-align:center;color:var(--muted);font:12px Arial,sans-serif;padding:2
 <header>
   <div class="eyebrow">Un refugio entre páginas</div>
   <h1>La Biblioteca Secreta</h1>
-  <p>Historias para leer despacito, como si el mundo esperara.</p>
+  <p>Un rincón especial para guardar historias inolvidables.</p>
 </header>
 <main>
   <div class="toolbar">
@@ -66,7 +66,7 @@ function render(){
  const title=document.createElement('h2');title.textContent=b.title;
  const author=document.createElement('div');author.className='author';author.textContent=b.author||'Autoría no indicada';
  const tag=document.createElement('div');tag.className='tag';tag.textContent=b.category||'Novela';
- const btn=document.createElement('button');btn.textContent='Abrir y leer';btn.onclick=()=>{
+ const btn=document.createElement('button');btn.textContent='Abrir colección';btn.onclick=()=>{
   if(b.link){
     window.open(b.link,'_blank');
   }else{
@@ -79,7 +79,7 @@ function openBook(b){
  document.getElementById('readerTitle').textContent=b.title;
  document.getElementById('readerAuthor').textContent=b.author||'Autoría no indicada';
  const body=document.getElementById('readerBody');body.textContent='';
- (b.content||'Esta novela aún no tiene texto. Añade el contenido en books.js para publicarlo.').split(/\n\s*\n/).forEach(p=>{const para=document.createElement('p');para.textContent=p;body.appendChild(para)});
+ (b.content||'Este apartado todavia me falta rellenarlo, pero no se como :), si quieres que agrege otro me mandas el nombre.').split(/\n\s*\n/).forEach(p=>{const para=document.createElement('p');para.textContent=p;body.appendChild(para)});
  reader.classList.add('active');shelf.style.display='none';document.querySelector('.toolbar').style.display='none';reader.scrollIntoView({behavior:'smooth'});
 }
 document.getElementById('back').onclick=()=>{reader.classList.remove('active');shelf.style.display='grid';document.querySelector('.toolbar').style.display='flex';window.scrollTo({top:0,behavior:'smooth'})};
