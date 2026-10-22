@@ -3,7 +3,7 @@
 // Publica únicamente textos propios o que tengas permiso para compartir.
 const BOOKS = [
   {
-    title: "La carta bajo la lluvia",
+    title: "La Emperatriz se volvio a casar",
     author: "Biblioteca de Yochi",
     category: "Novela",
     Link:
