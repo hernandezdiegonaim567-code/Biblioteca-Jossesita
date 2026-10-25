@@ -1,125 +1,454 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#241b18">
-<title>La Biblioteca de Joss</title>
-<style>
-:root{--ink:#2c211b;--muted:#76665b;--paper:#f6f0e5;--card:#fffaf1;--wine:#6b2737;--gold:#b08a50;--line:#dfd0ba}
-*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Georgia,'Times New Roman',serif}
-header{background:linear-gradient(120deg,#241b18,#4a3028);color:#f8edda;padding:34px 20px 28px;text-align:center;border-bottom:4px solid var(--gold)}
-.eyebrow{letter-spacing:.22em;text-transform:uppercase;font:11px Arial,sans-serif;color:#d9bd8b}
-h1{font-size:clamp(30px,6vw,52px);font-weight:normal;margin:10px 0 8px}header p{margin:0;color:#e1d2bd;font-style:italic}
-main{max-width:1050px;margin:0 auto;padding:24px 18px 60px}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 22px}
-input,select,button{font:15px Arial,sans-serif;border-radius:8px;padding:12px;border:1px solid var(--line);background:#fffaf3;color:var(--ink)}
-input{flex:1;min-width:190px}select{min-width:150px}
-.shelf{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.book{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;box-shadow:0 5px 15px #38251a0d;display:flex;flex-direction:column;min-height:220px}
-.book .ornament{color:var(--gold);font-size:25px}.book h2{font-size:22px;font-weight:normal;margin:12px 0 5px}.author{color:var(--muted);font-style:italic;font-size:14px}.tag{font:11px Arial,sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--wine);margin-top:12px}
-.book button{margin-top:auto;background:var(--wine);border-color:var(--wine);color:#fff8ed;cursor:pointer}
-.note{color:var(--muted);font:13px/1.6 Arial,sans-serif;margin:22px 2px}
-.reader{display:none;background:#fffaf1;border:1px solid var(--line);border-radius:12px;padding:clamp(20px,5vw,48px);margin-top:22px}
-.reader.active{display:block}.reader h2{font-size:clamp(27px,4vw,38px);font-weight:normal;margin:8px 0}.reader .body{font-size:19px;line-height:1.9;white-space:pre-wrap;max-width:720px;margin:28px auto}.reader .body p{margin:0 0 1.3em}
-.reader button{cursor:pointer;background:transparent}.reader-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.empty{grid-column:1/-1;text-align:center;padding:35px;color:var(--muted)}
-footer{text-align:center;color:var(--muted);font:12px Arial,sans-serif;padding:20px;border-top:1px solid var(--line)}
-</style>
-</head>
-<body>
-<header>
-  <div class="eyebrow">Un refugio entre páginas</div>
-  <h1>Biblioteca Jossesita</h1>
-  <p>Un rincón especial para guardar historias inolvidables.</p>
-</header>
-<main>
-  <div class="toolbar">
-    <input id="search" type="search" placeholder="Buscar por título o autor…" aria-label="Buscar novelas">
-    <select id="category" aria-label="Filtrar categoría"><option value="">Todas las categorías</option></select>
-  </div>
-  <section id="shelf" class="shelf" aria-live="polite"></section>
-  <p class="note"></p>
-  <section id="reader" class="reader">
-    <div class="reader-head">
-      <button id="back">← Volver a la biblioteca</button>
-      <span class="eyebrow">Sala de lectura</span>
-    </div>
-    <h2 id="readerTitle">Para que siempre tengas una historia esperándote.</h2>
-    <div id="readerAuthor" class="author"></div>
-    <div id="readerBody" class="body"></div>
-  </section>
-</main>
-<footer>Creada especialmente para Joss 💜</footer>
-<script src="books.js"></script>
-<script>
-const shelf=document.getElementById('shelf'), search=document.getElementById('search'), category=document.getElementById('category'), reader=document.getElementById('reader');
-const cats=[...new Set(BOOKS.map(b=>b.category).filter(Boolean))];
-cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;category.appendChild(o)});
-function render(){
- const q=search.value.toLocaleLowerCase('es'), c=category.value;
- const list=BOOKS.filter(
-   b=>(!c||b.category===c)&&
-   (`${b.title} ${b.author} ${b.category}`.toLocaleLowerCase('es').includes(q))
- );
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f8f1e7">
+  <title>Biblioteca Jossesita</title>
 
- shelf.innerHTML='';
-
- if(!list.length){
-   shelf.innerHTML='<div class="empty">No encontramos esa novela. Prueba otra búsqueda.</div>';
-   return;
- }
-
- list.forEach((b)=>{
-
-   const card=document.createElement('article');
-   card.className='book';
-
-   const cover=document.createElement('img');
-   cover.src='Portada.jpg';
-   cover.style.width='100%';
-   cover.style.borderRadius='10px';
-   cover.style.marginBottom='15px';
-
-   const title=document.createElement('h2');
-   title.textContent=b.title;
-
-   const author=document.createElement('div');
-   author.className='author';
-   author.textContent=b.author || 'Autoría no indicada';
-
-   const tag=document.createElement('div');
-   tag.className='tag';
-   tag.textContent=b.category || 'Novela';
-
-   const btn=document.createElement('button');
-   btn.textContent='Abrir colección';
-
-   btn.onclick=()=>{
-      if(b.link){
-         window.open(b.link,'_blank');
-      }else{
-         openBook(b);
-      }
-   };
-
-   card.append(
-      cover,
-      title,
-      author,
-      tag,
-      btn
-   );
-
-   shelf.append(card);
- });
-}
-function openBook(b){
-    if(b.link){
-        window.open(b.link,'_blank');
+  <style>
+    :root {
+      --fondo: #f8f1e7;
+      --papel: #fffaf2;
+      --vino: #702d42;
+      --vino-oscuro: #4c1e2d;
+      --dorado: #c4a265;
+      --texto: #352820;
+      --suave: #806e61;
     }
-}
-document.getElementById('back').onclick=()=>{reader.classList.remove('active');shelf.style.display='grid';document.querySelector('.toolbar').style.display='flex';window.scrollTo({top:0,behavior:'smooth'})};
-search.addEventListener('input',render);category.addEventListener('change',render);render();
-</script>
-</body></html>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--fondo);
+      color: var(--texto);
+    }
+
+    header {
+      text-align: center;
+      padding: 55px 20px 45px;
+      background: linear-gradient(135deg, #4c1e2d, #843d52);
+      color: #fffaf2;
+      border-bottom: 4px solid var(--dorado);
+    }
+
+    .ornamento {
+      color: var(--dorado);
+      font-size: 25px;
+      letter-spacing: 8px;
+      margin-bottom: 12px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: normal;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      margin: 15px 0 0;
+      color: #f0dfd5;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .contenedor {
+      width: min(1100px, 92%);
+      margin: 0 auto;
+      padding: 35px 0 55px;
+    }
+
+    .introduccion {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 30px;
+      line-height: 1.8;
+      color: var(--suave);
+    }
+
+    .introduccion h2 {
+      color: var(--vino);
+      font-size: 27px;
+      font-weight: normal;
+      margin-bottom: 10px;
+    }
+
+    .controles {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    input,
+    select {
+      font-family: Arial, sans-serif;
+      font-size: 15px;
+      padding: 13px 15px;
+      border: 1px solid #d9c7b6;
+      border-radius: 8px;
+      background: var(--papel);
+      color: var(--texto);
+      outline: none;
+    }
+
+    input {
+      width: min(380px, 100%);
+    }
+
+    select {
+      min-width: 170px;
+      cursor: pointer;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--vino);
+      box-shadow: 0 0 0 2px #702d4220;
+    }
+
+    .estante {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+    }
+
+    .libro {
+      background: var(--papel);
+      border: 1px solid #e5d8c8;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 16px #4c1e2d0b;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .libro:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 25px #4c1e2d18;
+    }
+
+    .portada {
+      width: 100%;
+      height: 285px;
+      display: block;
+      object-fit: cover;
+      background: #eadfd0;
+    }
+
+    .portada-fallback {
+      height: 285px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+      padding: 25px;
+      text-align: center;
+      color: var(--vino);
+      background: linear-gradient(145deg, #f3e6d5, #e5d0b6);
+    }
+
+    .portada-fallback span {
+      font-size: 42px;
+    }
+
+    .portada-fallback strong {
+      font-size: 23px;
+      font-weight: normal;
+      line-height: 1.4;
+    }
+
+    .info {
+      padding: 20px;
+    }
+
+    .categoria {
+      display: inline-block;
+      color: var(--vino);
+      background: #f0e3df;
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-family: Arial, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .info h3 {
+      color: var(--vino-oscuro);
+      font-size: 21px;
+      font-weight: normal;
+      line-height: 1.4;
+      margin: 13px 0 8px;
+    }
+
+    .autor {
+      font-size: 14px;
+      color: var(--suave);
+      margin: 0 0 18px;
+    }
+
+    .boton {
+      display: block;
+      width: 100%;
+      text-align: center;
+      text-decoration: none;
+      padding: 12px 14px;
+      border: 1px solid var(--vino);
+      border-radius: 7px;
+      background: var(--vino);
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .boton:hover {
+      background: var(--vino-oscuro);
+    }
+
+    .sin-resultados {
+      display: none;
+      text-align: center;
+      color: var(--suave);
+      padding: 35px 15px;
+      line-height: 1.7;
+    }
+
+    footer {
+      padding: 25px 15px;
+      text-align: center;
+      background: #eee2d4;
+      color: var(--suave);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    footer .corazon {
+      color: var(--vino);
+    }
+
+    @media (max-width: 500px) {
+      header {
+        padding: 42px 16px 35px;
+      }
+
+      .contenedor {
+        width: 90%;
+        padding-top: 25px;
+      }
+
+      .controles {
+        flex-direction: column;
+      }
+
+      input,
+      select {
+        width: 100%;
+      }
+
+      .estante {
+        grid-template-columns: 1fr;
+      }
+
+      .portada,
+      .portada-fallback {
+        height: 320px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="ornamento">✦ ❦ ✦</div>
+    <h1>Biblioteca Jossesita</h1>
+    <p>Un rincón especial para guardar historias inolvidables.</p>
+  </header>
+
+  <main class="contenedor">
+
+    <section class="introduccion">
+      <h2>Un mundo de historias para ti</h2>
+      <p>
+        Cada libro guarda una aventura esperando ser descubierta.
+        Explora la colección y encuentra tu próxima historia favorita.
+      </p>
+    </section>
+
+    <section class="controles" aria-label="Buscar libros">
+      <input
+        type="search"
+        id="search"
+        placeholder="Buscar por título o autor..."
+        aria-label="Buscar por título o autor"
+      >
+
+      <select id="category" aria-label="Filtrar por categoría">
+        <option value="">Todas las categorías</option>
+      </select>
+    </section>
+
+    <section
+      id="shelf"
+      class="estante"
+      aria-label="Colección de libros"
+    ></section>
+
+    <p id="noResults" class="sin-resultados">
+      No encontramos libros con esa búsqueda. ♡<br>
+      Prueba con otro título o categoría.
+    </p>
+
+  </main>
+
+  <footer>
+    Hecho con <span class="corazon">♥</span> para alguien especial.
+    <br>
+    Biblioteca Jossesita · Un pequeño universo de historias.
+  </footer>
+
+  <!-- Cargar los libros desde el archivo separado -->
+  <script src="books.js"></script>
+
+  <script>
+    const books =
+      typeof BOOKS !== "undefined" && Array.isArray(BOOKS)
+        ? BOOKS
+        : [];
+
+    const shelf = document.getElementById("shelf");
+    const search = document.getElementById("search");
+    const category = document.getElementById("category");
+    const noResults = document.getElementById("noResults");
+
+    // Crear las categorías automáticamente.
+    const categories = [
+      ...new Set(
+        books
+          .map(book => book.category)
+          .filter(Boolean)
+      )
+    ].sort((a, b) => a.localeCompare(b, "es"));
+
+    categories.forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat;
+      option.textContent = cat;
+      category.appendChild(option);
+    });
+
+    function renderBooks() {
+      const query = search.value.trim().toLocaleLowerCase("es");
+      const selectedCategory = category.value;
+
+      const filteredBooks = books.filter(book => {
+        const title = (book.title || "").toLocaleLowerCase("es");
+        const author = (book.author || "").toLocaleLowerCase("es");
+
+        const matchesSearch =
+          title.includes(query) || author.includes(query);
+
+        const matchesCategory =
+          !selectedCategory || book.category === selectedCategory;
+
+        return matchesSearch && matchesCategory;
+      });
+
+      shelf.replaceChildren();
+
+      filteredBooks.forEach(book => {
+        const card = document.createElement("article");
+        card.className = "libro";
+
+        if (book.cover) {
+          const cover = document.createElement("img");
+          cover.className = "portada";
+          cover.src = book.cover;
+          cover.alt = "Portada de " + (book.title || "libro");
+          cover.loading = "lazy";
+
+          cover.onerror = () => {
+            const fallback = document.createElement("div");
+            fallback.className = "portada-fallback";
+
+            const symbol = document.createElement("span");
+            symbol.textContent = "❦";
+
+            const title = document.createElement("strong");
+            title.textContent = book.title || "Una historia por descubrir";
+
+            fallback.append(symbol, title);
+            cover.replaceWith(fallback);
+          };
+
+          card.appendChild(cover);
+        } else {
+          const fallback = document.createElement("div");
+          fallback.className = "portada-fallback";
+
+          const symbol = document.createElement("span");
+          symbol.textContent = "❦";
+
+          const title = document.createElement("strong");
+          title.textContent = book.title || "Una historia por descubrir";
+
+          fallback.append(symbol, title);
+          card.appendChild(fallback);
+        }
+
+        const info = document.createElement("div");
+        info.className = "info";
+
+        const tag = document.createElement("span");
+        tag.className = "categoria";
+        tag.textContent = book.category || "Lectura";
+
+        const title = document.createElement("h3");
+        title.textContent = book.title || "Libro sin título";
+
+        const author = document.createElement("p");
+        author.className = "autor";
+        author.textContent = "Por: " + (book.author || "Autor desconocido");
+
+        const button = document.createElement("a");
+        button.className = "boton";
+        button.textContent = "Abrir colección";
+        button.href = book.link || "#";
+        button.target = "_blank";
+        button.rel = "noopener noreferrer";
+
+        if (!book.link) {
+          button.removeAttribute("target");
+          button.addEventListener("click", event => {
+            event.preventDefault();
+            alert("Este libro todavía no tiene un enlace.");
+          });
+        }
+
+        info.append(tag, title, author, button);
+        card.appendChild(info);
+        shelf.appendChild(card);
+      });
+
+      noResults.style.display =
+        filteredBooks.length === 0 ? "block" : "none";
+    }
+
+    search.addEventListener("input", renderBooks);
+    category.addEventListener("change", renderBooks);
+
+    renderBooks();
+  </script>
+
+</body>
+</html>
